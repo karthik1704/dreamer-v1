@@ -11,3 +11,6 @@ db_config = {
     'host': os.getenv('DB_HOST'),
     'db_name': os.getenv('DB_NAME')
 }
+
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")  # should be kept secret
+JWT_REFRESH_SECRET_KEY = os.getenv("JWT_REFRESH_SECRET_KEY")
