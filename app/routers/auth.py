@@ -38,7 +38,7 @@ async def admin_login(
     response.set_cookie(
         key="access_token",
         value=token,
-        max_age=3600,
+        max_age=2 * 24 * 60 * 60,  # Two days in seconds
         secure=False,
         httponly=True,
         path="/",

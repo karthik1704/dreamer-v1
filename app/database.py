@@ -5,14 +5,14 @@ from .settings import DEBUG, db_config
 
 
 def get_database_url() -> str:
-    if DEBUG:
-        return "postgresql+psycopg://postgres:postgres@localhost/dreamer"
-    else:
-        return (
-            f"postgresql+psycopg://{db_config['username']}:"
-            f"{db_config['password']}@{db_config['host']}/"
-            f"{db_config['db_name']}"
-        )
+    # if DEBUG:
+    #     return "postgresql+psycopg://postgres:postgres@localhost/dreamer"
+    # else:
+    return (
+        f"postgresql+psycopg://{db_config['username']}:"
+        f"{db_config['password']}@{db_config['host']}/"
+        f"{db_config['db_name']}"
+    )
 
 
 SQLALCHEMY_DATABASE_URL = get_database_url()
@@ -31,6 +31,7 @@ AsyncSessionFactory = async_sessionmaker(
     autoflush=False,
     expire_on_commit=False,
 )
+
 
 # Dependency for FastAPI routes
 async def get_async_db() -> AsyncGenerator[AsyncSession, None]:

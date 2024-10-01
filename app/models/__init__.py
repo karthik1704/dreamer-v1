@@ -4,4 +4,4 @@ class Base(DeclarativeBase):
     pass
 
     
-from .users import User
+from .users import User, UserProfile
