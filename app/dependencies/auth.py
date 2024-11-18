@@ -5,6 +5,7 @@ from jose import JWTError
 from ..utils.auth import decode_access_token
 
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/')
+oauth2_bearer_student = OAuth2PasswordBearer(tokenUrl='auth/student/')
 
 
 async def get_current_user(token:Annotated[str, Depends(oauth2_bearer)]):
@@ -26,7 +27,7 @@ async def get_current_user(token:Annotated[str, Depends(oauth2_bearer)]):
         print("jwt error")
         raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED, detail='Could not validate user.')
     
-async def get_current_student(token:Annotated[str, Depends(oauth2_bearer)]):
+async def get_current_student(token:Annotated[str, Depends(oauth2_bearer_student)]):
     print("get current user")
     # return {'email':"krishna@test.com", 'id': 1, 'role_id':1, "dept_id" : 1 }
     try:

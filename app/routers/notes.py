@@ -1,52 +1,96 @@
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, HTTPException, Path
 from starlette import status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated, List
 from app.database import get_async_db
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import get_current_student, get_current_user
 
 from app.models.notes import Note
-from app.schemas.users import UserCreate, UserSchema, UserUpdate
+from app.schemas.notes import NoteCreate, NoteSchema
 
 router = APIRouter(prefix="/notes", tags=["Notes"])
 
 db_dep = Annotated[AsyncSession, Depends(get_async_db)]
 user_dep = Annotated[dict, Depends(get_current_user)]
+student_dep = Annotated[dict, Depends(get_current_student)]
 
 
-@router.get("/", response_model=List[UserSchema])
+@router.get("/", response_model=List[NoteSchema])
 async def get_all_notes(db: db_dep, user: user_dep):
 
-    users = await Note.get_all(db, [Note.batch_id == user.get("batch_id")])
+    notes = await Note.get_all(db, [])
 
-    return users
+    return notes
 
+@router.get("/{id}/", response_model=NoteSchema)    
+async def get_note(db: db_dep, user: user_dep, id: int = Path(gt=0)):
 
+    note_detail = await Note.get_one(db, [Note.id == id])
 
-@router.get("/{id}/", response_model=UserSchema)
-async def get_user(db: db_dep, user: user_dep, id: int = Path(gt=0)):
+    return note_detail
 
-    user_detail = await Note.get_one(db, [Note.id == id])
+@router.post("/", status_code=status.HTTP_201_CREATED)  # status code 201 for created
+async def create_note(data: NoteCreate, db: db_dep, user: user_dep):
 
-    return user_detail
+    new_note_data = data.model_dump()
 
+    await Note.create_note(db, new_note_data)
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_user(
-    data: UserCreate,
-    db: db_dep,
-    user: user_dep,
+@router.put("/{id}/", status_code=status.HTTP_204_NO_CONTENT)
+async def update_note(
+    data: NoteCreate, db: db_dep, user: user_dep, id: int = Path(gt=0)
 ):
 
-    new_user = User(**data.model_dump())
-    db.add(new_user)
+    updated_data = data.model_dump()
+
+    note = await Note.get_one(db, [Note.id == id])
+
+    if not note:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Note not found",
+        )
+
+    note.update_note(updated_data)
+
+   
+
+@router.delete("/{id}/", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_note(db: db_dep, user: user_dep, id: int = Path(gt=0)):
+
+    note = await Note.get_one(db, [Note.id == id])
+
+    if not note:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Note not found",
+        )
+
+    await db.delete(note)
     await db.commit()
 
+  
 
-@router.put("/{id}/", response_model=UserSchema)
-async def update_user( data: UserUpdate,db: db_dep, user: user_dep, id: int = Path(gt=0)):
+"""
+    Student Notes
+"""
 
-    users = await User.get_one(db, [User.id == id])
+@router.get("/student/", response_model=List[NoteSchema])
+async def get_student_notes(db: db_dep, student: student_dep):
 
-    return users
+    notes = await Note.get_all(db, [Note.batch_id == student['batch_id']])
 
+    return notes
+
+@router.get("/student/{id}/", response_model=NoteSchema)    
+async def get_student_note(db: db_dep, student: student_dep, id: int = Path(gt=0)):
+
+    note_detail = await Note.get_one(db, [Note.id == id, Note.batch_id == student['batch_id']])
+
+    if not note_detail:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Note not found",
+        )
+
+    return note_detail

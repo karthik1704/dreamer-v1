@@ -38,7 +38,7 @@ class Student(Base, DefaultFieldsMixin):
         return _result.scalars().first()
 
     @classmethod
-    async def create_user(cls, db: AsyncSession, desk):
+    async def create_student(cls, db: AsyncSession, desk):
         db.add(desk)
         await db.commit()
         await db.refresh(desk)
@@ -46,7 +46,7 @@ class Student(Base, DefaultFieldsMixin):
         db.add(student_profile)
         await db.commit()
 
-    def update_user(self, updated_data):
+    def update_student(self, updated_data):
         for field, value in updated_data.items():
             setattr(self, field, value)
 
