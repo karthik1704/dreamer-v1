@@ -37,6 +37,25 @@ def create_access_token(
     encoded_jwt = jwt.encode(encode, JWT_SECRET_KEY, ALGORITHM)
     return encoded_jwt
 
+def create_student_access_token(
+    username: str,
+    email: str,
+    user_id: int,
+    batch_id: int,
+    expires_delta: int | None = None,
+) -> str:
+    if expires_delta is not None:
+        expires_at = datetime.now(UTC) + timedelta(days=30)
+    else:
+        expires_at = datetime.now(UTC) + timedelta(days=30)
+
+    print(expires_at)
+
+    encode = {"sub": username, "email":email, "id": user_id, "batch_id": batch_id}
+    encode.update({"exp": expires_at})
+    encoded_jwt = jwt.encode(encode, JWT_SECRET_KEY, ALGORITHM)
+    return encoded_jwt
+
 
 def create_refresh_token(
     email: str, user_id: int, role: str, expires_delta: int | None = None

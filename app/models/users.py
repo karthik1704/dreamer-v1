@@ -29,6 +29,7 @@ class User(Base, DefaultFieldsMixin):
     is_staff: Mapped[bool] = mapped_column(Boolean(), default=False)
     is_superuser: Mapped[bool] = mapped_column(Boolean(), default=False)
 
+
     profile: Mapped[Optional['UserProfile']] = relationship("UserProfile", back_populates="user")
 
     @classmethod

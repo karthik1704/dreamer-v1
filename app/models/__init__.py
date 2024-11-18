@@ -5,3 +5,6 @@ class Base(DeclarativeBase):
 
     
 from .users import User, UserProfile
+from .students import Student, StudentProfile
+from .notes import Note
+from .videos import Video
