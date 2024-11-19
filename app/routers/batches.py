@@ -9,7 +9,7 @@ from app.models.batches import Batch
 from app.schemas.batches import BatchCreate, BatchSchema
 
 
-router = APIRouter(prefix="/notes", tags=["Notes"])
+router = APIRouter(prefix="/batches", tags=["Notes"])
 
 db_dep = Annotated[AsyncSession, Depends(get_async_db)]
 user_dep = Annotated[dict, Depends(get_current_user)]
@@ -36,16 +36,17 @@ async def get_batch(db: db_dep, user: user_dep, id: int = Path(gt=0)):
 async def create_batch(data: BatchCreate, db: db_dep, user: user_dep):
 
     new_batch_data = data.model_dump()
+    new_batch = Batch(**new_batch_data)
+    await Batch.create_batch(db, new_batch)
 
-    await Batch.create_batch(db, new_batch_data)
 
-
-@router.put("/{id}/", response_model=BatchSchema)
+@router.put("/{id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def update_batch(
     data: BatchCreate, db: db_dep, user: user_dep, id: int = Path(gt=0)
 ):
 
     updated_data = data.model_dump()
+    print(updated_data)
 
     batch = await Batch.get_one(db, [Batch.id == id])
 
@@ -56,6 +57,8 @@ async def update_batch(
         )
 
     batch.update_batch(updated_data)
+
+    await db.commit()
 
 
 @router.delete("/{id}/",  status_code=status.HTTP_204_NO_CONTENT)

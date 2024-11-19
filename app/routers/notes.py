@@ -33,8 +33,8 @@ async def get_note(db: db_dep, user: user_dep, id: int = Path(gt=0)):
 async def create_note(data: NoteCreate, db: db_dep, user: user_dep):
 
     new_note_data = data.model_dump()
-
-    await Note.create_note(db, new_note_data)
+    new_note = Note(**new_note_data)
+    await Note.create_note(db, new_note)
 
 @router.put("/{id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def update_note(
@@ -52,8 +52,7 @@ async def update_note(
         )
 
     note.update_note(updated_data)
-
-   
+    await db.commit()
 
 @router.delete("/{id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_note(db: db_dep, user: user_dep, id: int = Path(gt=0)):

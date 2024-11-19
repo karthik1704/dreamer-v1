@@ -8,7 +8,7 @@ from app.dependencies.auth import get_current_student, get_current_user
 from app.models.videos import Video
 from app.schemas.videos import VideoCreate, VideoSchema
 
-router = APIRouter(prefix="/notes", tags=["Notes"])
+router = APIRouter(prefix="/videos", tags=["Notes"])
 
 db_dep = Annotated[AsyncSession, Depends(get_async_db)]
 user_dep = Annotated[dict, Depends(get_current_user)]
@@ -42,7 +42,9 @@ async def create_video(data: VideoCreate, db: db_dep, user: user_dep):
 
     new_video_data = data.model_dump()
 
-    await Video.create_video(db, new_video_data)
+    new_video = Video(**new_video_data)
+
+    await Video.create_video(db, new_video)
 
 
 @router.put("/{id}/", status_code=status.HTTP_204_NO_CONTENT)
@@ -61,7 +63,7 @@ async def update_video(
         )
 
     video.update_video(updated_data)
-
+    await db.commit()
     
 
 
