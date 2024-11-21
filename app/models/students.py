@@ -22,8 +22,8 @@ class Student(Base, DefaultFieldsMixin):
     date_of_birth: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     gender: Mapped[str] = mapped_column(nullable=False)
 
-    student_profile: Mapped[Optional["StudentProfile"]] = relationship("StudentProfile", back_populates="student")
-    batch: Mapped["Batch"] = relationship("Batch", back_populates="students")
+    student_profile: Mapped[Optional["StudentProfile"]] = relationship("StudentProfile", back_populates="student",  lazy="selectin")
+    batch: Mapped["Batch"] = relationship("Batch", back_populates="students", lazy="selectin")
 
     @classmethod
     async def get_all(cls, db_session:AsyncSession, where_condition:list[Any]):
@@ -60,6 +60,8 @@ class StudentProfile(Base, DefaultFieldsMixin):
     student_id: Mapped[str] = mapped_column(ForeignKey("students.id"), nullable=False)
     
     student_photo: Mapped[Optional[str]] = mapped_column(nullable=True)
+    father_name: Mapped[Optional[str]] = mapped_column(nullable=True)
+    mother_name: Mapped[Optional[str]] = mapped_column(nullable=True)
     father_phone_number: Mapped[Optional[str]] = mapped_column(nullable=True)
     mother_phone_number: Mapped[Optional[str]] = mapped_column(nullable=True)
     siblings_phone_number: Mapped[Optional[str]] = mapped_column(nullable=True)
@@ -73,3 +75,22 @@ class StudentProfile(Base, DefaultFieldsMixin):
 
 
     student: Mapped["Student"] = relationship("Student", back_populates="student_profile")
+
+
+
+    @classmethod
+    async def get_all(cls, db_session:AsyncSession, where_condition:list[Any]):
+        _stmt = select(cls).where(*where_condition).order_by(desc(cls.id))
+        _results = await db_session.execute(_stmt)
+        return _results.scalars()
+    
+    @classmethod
+    async def get_one(cls, database_session: AsyncSession, where_conditions: list[Any]):
+        _stmt = select(cls).where(*where_conditions)
+        _result = await database_session.execute(_stmt)
+        return _result.scalars().first()
+
+   
+    def update_profile(self, updated_data):
+        for field, value in updated_data.items():
+            setattr(self, field, value)

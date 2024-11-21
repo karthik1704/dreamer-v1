@@ -1,3 +1,4 @@
+from pathlib import Path
 from dotenv import load_dotenv
 import os
 
@@ -17,6 +18,9 @@ if not os.getenv("JWT_SECRET_KEY"):
 if not os.getenv("JWT_REFRESH_SECRET_KEY"):
     raise ValueError("JWT_SECRET_KEY not found")
 
+
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
 

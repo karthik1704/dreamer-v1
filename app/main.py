@@ -1,9 +1,39 @@
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel, SecuritySchemeType
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
+from .settings import UPLOAD_DIR
 from .dependencies.auth import oauth2_bearer, oauth2_bearer_student
-from .routers import users, auth, batches, notes, videos
+from .routers import users, auth, batches, notes, videos, students
 app = FastAPI(title="Dreamer Acadamy V1", version="0.1.0")
+
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+    "https://www.workforce.seyonacademy.com",
+    "https://workforce.seyonacademy.com",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+
+
+# Serve the `uploads/` directory at 
+# the `/static` path
+app.mount("/static", StaticFiles(directory=UPLOAD_DIR), name="static")
+
+
+
 
 
 app.include_router(auth.router)
@@ -11,6 +41,7 @@ app.include_router(users.router)
 app.include_router(batches.router)
 app.include_router(notes.router)
 app.include_router(videos.router)
+app.include_router(students.router)
 
 
 

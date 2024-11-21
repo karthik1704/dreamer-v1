@@ -5,8 +5,10 @@ from pydantic import BaseModel
 from app.schemas.batches import BatchSchema
 
 class StudentProfileSchema(BaseModel):
-    student_id: str
+    student_id: int
     student_photo: Optional[str] = None
+    father_name: Optional[str] = None
+    mother_name: Optional[str] = None
     father_phone_number: Optional[str] = None
     mother_phone_number: Optional[str] = None
     siblings_phone_number: Optional[str] = None
@@ -19,8 +21,9 @@ class StudentProfileSchema(BaseModel):
     blood_group: Optional[str] = None
 
 class CreateStudentProfile(BaseModel):
-    student_id: str
     student_photo: Optional[str] = None
+    father_name: Optional[str] = None
+    mother_name: Optional[str] = None
     father_phone_number: Optional[str] = None
     mother_phone_number: Optional[str] = None
     siblings_phone_number: Optional[str] = None
@@ -32,6 +35,19 @@ class CreateStudentProfile(BaseModel):
     address: Optional[str] = None
     blood_group: Optional[str] = None
 
+class updateStudentProfile(BaseModel):
+    father_name: Optional[str] = None
+    mother_name: Optional[str] = None
+    father_phone_number: Optional[str] = None
+    mother_phone_number: Optional[str] = None
+    siblings_phone_number: Optional[str] = None
+    personal_number: Optional[str] = None
+    age: Optional[int] = None
+    school_name: Optional[str] = None
+    district: Optional[str] = None
+    state: Optional[str] = None
+    address: Optional[str] = None
+    blood_group: Optional[str] = None
 
 
 class StudentSchema(BaseModel):
@@ -60,6 +76,10 @@ class StudentCreate(BaseModel):
     email: str
     date_of_birth: datetime
     gender: str
-    student_profile: Optional[CreateStudentProfile]
+    student_profile: CreateStudentProfile
+
+
+class StudentUpdate(StudentCreate):
+    student_profile: Optional[updateStudentProfile]
 
 
