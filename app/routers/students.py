@@ -1,8 +1,10 @@
 import base64
+import datetime
 import os
 import shutil
 import uuid
 from fastapi import APIRouter, Depends, File, HTTPException, Path, UploadFile
+from httpx import get
 from starlette import status
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated, List
@@ -13,6 +15,7 @@ from pathlib import Path as PyPath
 from app.settings import UPLOAD_DIR
 from app.models.students import Student, StudentProfile
 from app.schemas.students import CreateStudentProfile, StudentSchema, StudentCreate, StudentUpdate
+from app.utils.auth import get_hashed_password
 
 router = APIRouter(prefix="/students", tags=["Notes"])
 
@@ -47,9 +50,33 @@ async def create_student(data: StudentCreate, db: db_dep, user: user_dep):
 
     new_student_data = data.model_dump()
     student_profile = new_student_data.pop("student_profile", None)
+    student_code = data.student_code
+    date_of_birth = data.date_of_birth
+
+    already_student_code_exists = await Student.get_one(db, [Student.student_code==student_code])
+
+    if already_student_code_exists:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Student code already exists",
+        )
+    
+
+    # Convert date_of_birth to the desired format
+    if date_of_birth:
+        try:
+            date_of_birth = datetime.datetime.strptime(str(date_of_birth).split(" ")[0], "%Y-%m-%d").strftime("%d-%m-%Y")
+            converted_dob = date_of_birth
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid date format. Expected format: YYYY-MM-DD",
+            )
+        
+    password = get_hashed_password(converted_dob)
 
     # Create the new student entry
-    new_student = Student(**new_student_data)
+    new_student = Student(**new_student_data, password=password)
 
     # Add to the session and flush
     db.add(new_student)

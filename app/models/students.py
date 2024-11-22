@@ -19,6 +19,7 @@ class Student(Base, DefaultFieldsMixin):
     first_name: Mapped[str] = mapped_column(nullable=False)
     last_name: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(unique=True, nullable=False)
+    password:Mapped[str] = mapped_column(nullable=True)
     date_of_birth: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     gender: Mapped[str] = mapped_column(nullable=False)
 
