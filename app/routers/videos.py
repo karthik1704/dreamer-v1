@@ -23,6 +23,43 @@ async def get_all_videos(db: db_dep, user: user_dep):
     return videos
 
 
+
+
+# """
+#     Student Videos
+# """
+
+
+@router.get("/student/", response_model=List[VideoSchema])
+async def get_all_student_videos(db: db_dep, user: user_dep, student: student_dep):
+
+    videos = await Video.get_all(db, [Video.batch_id == student["batch_id"]])
+
+    return videos
+
+
+@router.get("/student/{id}/", response_model=VideoSchema)
+async def get_student_video(
+    db: db_dep, user: user_dep, student: student_dep, id: int = Path(gt=0)
+):
+
+    video = await Video.get_one(
+        db, [Video.id == id, Video.batch_id == student["batch_id"]]
+    )
+
+    if not video:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Video not found",
+        )
+
+    return video
+
+# """
+# Admin API's
+# """
+
+
 @router.get("/{id}/", response_model=VideoSchema)
 async def get_video(db: db_dep, user: user_dep, id: int = Path(gt=0)):
 
@@ -80,34 +117,3 @@ async def delete_video(db: db_dep, user: user_dep, id: int = Path(gt=0)):
 
     await db.delete(video)
     await db.commit()
-
-
-# """
-#     Student Videos
-# """
-
-
-@router.get("/student/", response_model=List[VideoSchema])
-async def get_all_student_videos(db: db_dep, user: user_dep, student: student_dep):
-
-    videos = await Video.get_all(db, [Video.batch_id == student["batch_id"]])
-
-    return videos
-
-
-@router.get("/student/{id}/", response_model=VideoSchema)
-async def get_student_video(
-    db: db_dep, user: user_dep, student: student_dep, id: int = Path(gt=0)
-):
-
-    video = await Video.get_one(
-        db, [Video.id == id, Video.batch_id == student["batch_id"]]
-    )
-
-    if not video:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Video not found",
-        )
-
-    return video

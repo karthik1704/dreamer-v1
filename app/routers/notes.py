@@ -22,6 +22,35 @@ async def get_all_notes(db: db_dep, user: user_dep):
 
     return notes
 
+
+"""
+    Student Notes
+"""
+
+@router.get("/student/", response_model=List[NoteSchema])
+async def get_student_notes(db: db_dep, student: student_dep):
+
+    notes = await Note.get_all(db, [Note.batch_id == student['batch_id']])
+
+    return notes
+
+@router.get("/student/{id}/", response_model=NoteSchema)    
+async def get_student_note(db: db_dep, student: student_dep, id: int = Path(gt=0)):
+
+    note_detail = await Note.get_one(db, [Note.id == id, Note.batch_id == student['batch_id']])
+
+    if not note_detail:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Note not found",
+        )
+
+    return note_detail
+
+# """
+# Admin API's
+# """
+
 @router.get("/{id}/", response_model=NoteSchema)    
 async def get_note(db: db_dep, user: user_dep, id: int = Path(gt=0)):
 
@@ -69,27 +98,3 @@ async def delete_note(db: db_dep, user: user_dep, id: int = Path(gt=0)):
     await db.commit()
 
   
-
-"""
-    Student Notes
-"""
-
-@router.get("/student/", response_model=List[NoteSchema])
-async def get_student_notes(db: db_dep, student: student_dep):
-
-    notes = await Note.get_all(db, [Note.batch_id == student['batch_id']])
-
-    return notes
-
-@router.get("/student/{id}/", response_model=NoteSchema)    
-async def get_student_note(db: db_dep, student: student_dep, id: int = Path(gt=0)):
-
-    note_detail = await Note.get_one(db, [Note.id == id, Note.batch_id == student['batch_id']])
-
-    if not note_detail:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Note not found",
-        )
-
-    return note_detail
