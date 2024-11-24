@@ -23,11 +23,13 @@ async def authenticate_user(username: str, password: str, db: db_dep):
         return False
     return user
 
-async def authenticate_student(username: str, dob: str, db: db_dep):
+async def authenticate_student(username: str, password: str, db: db_dep):
     user = await Student.get_one(db, [Student.student_code == username])
     if not user:
+        print('user')
         return False
-    if user.date_of_birth != dob:
+    if not verify_password(password, user.password):
+        print('password')
         return False
     return user
 

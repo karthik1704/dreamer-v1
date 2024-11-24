@@ -32,6 +32,47 @@ async def get_all_students(db: db_dep, user: user_dep):
     return students
 
 
+# """
+# Students API
+# """
+
+
+@router.get("/me/", response_model=StudentSchema)
+async def get_current_logged_student(db: db_dep, student: student_dep):
+
+    student_detail = await Student.get_one(db, [Student.id == student.get("id")])
+
+    if not student_detail:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found",
+        )
+
+    return student_detail
+
+
+@router.put("/me/", status_code=status.HTTP_204_NO_CONTENT)
+async def update_current_logged_student(
+    data: StudentCreate, db: db_dep, student: student_dep
+):
+
+    student_detail = await Student.get_one(db, [Student.id == student["id"]])
+    if not student_detail:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found",
+        )
+
+    updated_data = data.model_dump()
+    student_detail.update_student(updated_data)
+
+    await db.commit()
+
+
+
+# Admin API's
+
+
 @router.get("/{id}/", response_model=StudentSchema)
 async def get_student(db: db_dep, user: user_dep, id: int = Path(gt=0)):
 
@@ -200,38 +241,3 @@ async def upload_image(
 
     return {"message": "Image uploaded successfully", "student_photo": profile.student_photo}
 
-# """
-# Students API
-# """
-
-
-@router.get("/me/", response_model=StudentSchema)
-async def get_current_logged_student(db: db_dep, student: student_dep):
-
-    student_detail = await Student.get_one(db, [Student.id == student["id"]])
-
-    if not student_detail:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Student not found",
-        )
-
-    return student_detail
-
-
-@router.put("/me/", status_code=status.HTTP_204_NO_CONTENT)
-async def update_current_logged_student(
-    data: StudentCreate, db: db_dep, student: student_dep
-):
-
-    student_detail = await Student.get_one(db, [Student.id == student["id"]])
-    if not student_detail:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Student not found",
-        )
-
-    updated_data = data.model_dump()
-    student_detail.update_student(updated_data)
-
-    await db.commit()
