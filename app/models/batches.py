@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from .notes import Note
     from .videos import Video
     from .students import Student
+    from .live_classes import LiveClasses
 
 
 class Batch (Base, DefaultFieldsMixin):
@@ -27,7 +28,7 @@ class Batch (Base, DefaultFieldsMixin):
     batch_notes: Mapped[list["Note"]] = relationship("Note", back_populates="batch")
     batch_videos: Mapped[list["Video"]] = relationship("Video", back_populates="batch")
     students: Mapped[list["Student"]] = relationship("Student", back_populates="batch")
-
+    live_classes: Mapped[list["LiveClasses"]] = relationship("LiveClasses", back_populates="batch")
 
     @classmethod
     async def get_all(cls, db_session:AsyncSession, where_condition:list[Any]):

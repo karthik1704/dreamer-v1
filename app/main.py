@@ -4,17 +4,21 @@ from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel, SecurityScheme
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
+
 from .settings import UPLOAD_DIR
 from .dependencies.auth import oauth2_bearer, oauth2_bearer_student
-from .routers import users, auth, batches, notes, videos, students
-app = FastAPI(title="Dreamer Acadamy V1", version="0.1.0")
+from .routers import users, auth, batches, notes, videos, students, live_classes
+
+app = FastAPI(title="Seyon Acadamy V1", version="0.1.0")
 
 
 origins = [
     "http://localhost",
     "http://localhost:3000",
-    "https://www.workforce.seyonacademy.com",
-    "https://workforce.seyonacademy.com",
+    "https://www.crm.seyonacademy.com",
+    "https://crm.seyonacademy.com",
+    "https://seyonacademy.com",
+    "https://www.seyonacademy.com",
 ]
 
 app.add_middleware(
@@ -42,6 +46,7 @@ app.include_router(batches.router)
 app.include_router(notes.router)
 app.include_router(videos.router)
 app.include_router(students.router)
+app.include_router(live_classes.router)
 
 
 
