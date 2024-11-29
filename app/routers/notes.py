@@ -5,8 +5,8 @@ from typing import Annotated, List
 from app.database import get_async_db
 from app.dependencies.auth import get_current_student, get_current_user
 
-from app.models.notes import Note
-from app.schemas.notes import NoteCreate, NoteSchema
+from app.models.notes import Note, NoteCategory
+from app.schemas.notes import NoteCategoryCreate, NoteCategorySchema, NoteCreate, NoteSchema
 
 router = APIRouter(prefix="/notes", tags=["Notes"])
 
@@ -22,10 +22,73 @@ async def get_all_notes(db: db_dep, user: user_dep):
 
     return notes
 
+# """
+#     Note Categories API's
+# """
 
-"""
-    Student Notes
-"""
+@router.get("/categories/", )
+async def get_categories_without_repeat (db: db_dep, user: user_dep):
+
+    categories = await NoteCategory.get_all_without_repeat(db, [])
+
+    return categories
+
+@router.get("/categories/all/",  response_model=List[NoteCategorySchema])
+async def get_all_categories(db: db_dep, user: user_dep):
+
+    categories = await NoteCategory.get_all(db, [])
+   
+    return categories
+
+@router.get("/categories/{id}/", response_model=NoteCategorySchema)
+async def get_category(db: db_dep, user: user_dep, id: int = Path(gt=0)):
+        
+        category = await NoteCategory.get_one(db, [NoteCategory.id == id])
+    
+        return category
+
+@router.post("/categories/", status_code=status.HTTP_201_CREATED)  # status code 201 for created
+async def create_category(data: NoteCategoryCreate, db: db_dep, user: user_dep):
+
+    new_category_data = data.model_dump()
+    new_category = NoteCategory(**new_category_data)
+    await NoteCategory.create_note_category(db, new_category)
+
+@router.put("/categories/{id}/", status_code=status.HTTP_204_NO_CONTENT)
+async def update_category(
+    data: NoteCategoryCreate, db: db_dep, user: user_dep, id: int = Path(gt=0)
+):
+
+    updated_data = data.model_dump()
+
+    category = await NoteCategory.get_one(db, [NoteCategory.id == id])
+
+    if not category:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Category not found",
+        )
+
+    category.update_note_category(updated_data)
+    await db.commit()
+
+@router.delete("/categories/{id}/", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_category(db: db_dep, user: user_dep, id: int = Path(gt=0)):
+
+    category = await NoteCategory.get_one(db, [NoteCategory.id == id])
+
+    if not category:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Category not found",
+        )
+
+    await db.delete(category)
+    await db.commit()
+
+# """
+#     Student Notes
+# """
 
 @router.get("/student/", response_model=List[NoteSchema])
 async def get_student_notes(db: db_dep, student: student_dep):

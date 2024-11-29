@@ -17,12 +17,13 @@ if TYPE_CHECKING:
 class LiveClass (Base, DefaultFieldsMixin):
     __tablename__="live-classes"
 
+    class_name: Mapped[str]
     class_link: Mapped[str]
     batch_id: Mapped[int] = mapped_column(ForeignKey("batches.id"), nullable=False, unique=True)
     start_time: Mapped[datetime]
     end_time: Mapped[datetime]
 
-    batch: Mapped["Batch"] = relationship("Batch", back_populates="live_classes")
+    batch: Mapped["Batch"] = relationship("Batch", back_populates="live_classes", lazy="selectin")
 
     @classmethod
     async def get_all(cls, db_session:AsyncSession, where_condition:list[Any]):
