@@ -24,7 +24,7 @@ class NoteCategory(Base, DefaultFieldsMixin):
     )
 
     parent: Mapped[Optional["NoteCategory"]] = relationship(
-        "NoteCategory", remote_side="NoteCategory.id", back_populates="children", lazy="selectin"
+        "NoteCategory", remote_side="NoteCategory.id", back_populates="children", lazy="joined"
     )
     children: Mapped[List["NoteCategory"]] = relationship(
         "NoteCategory", back_populates="parent", lazy="selectin"
@@ -95,9 +95,9 @@ class Note(Base, DefaultFieldsMixin):
     category_id: Mapped[int] = mapped_column(
         ForeignKey("note_categories.id"), nullable=True
     )
-    batch: Mapped["Batch"] = relationship("Batch", back_populates="batch_notes")
+    batch: Mapped["Batch"] = relationship("Batch", back_populates="batch_notes", lazy="selectin")
     category: Mapped["NoteCategory"] = relationship(
-        "NoteCategory", back_populates="notes"
+        "NoteCategory", back_populates="notes", lazy="selectin"
     )
 
     @classmethod

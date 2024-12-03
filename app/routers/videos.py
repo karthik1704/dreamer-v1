@@ -8,7 +8,7 @@ from app.dependencies.auth import get_current_student, get_current_user
 from app.models.videos import Video
 from app.schemas.videos import VideoCreate, VideoSchema
 
-router = APIRouter(prefix="/videos", tags=["Notes"])
+router = APIRouter(prefix="/videos", tags=["Videos"])
 
 db_dep = Annotated[AsyncSession, Depends(get_async_db)]
 user_dep = Annotated[dict, Depends(get_current_user)]

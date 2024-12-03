@@ -17,7 +17,7 @@ from app.models.students import Student, StudentProfile
 from app.schemas.students import CreateStudentProfile, StudentSchema, StudentCreate, StudentUpdate
 from app.utils.auth import get_hashed_password
 
-router = APIRouter(prefix="/students", tags=["Notes"])
+router = APIRouter(prefix="/students", tags=["Students"])
 
 db_dep = Annotated[AsyncSession, Depends(get_async_db)]
 user_dep = Annotated[dict, Depends(get_current_user)]
