@@ -9,7 +9,7 @@ from app.models.batches import Batch
 from app.schemas.batches import BatchCreate, BatchSchema
 
 
-router = APIRouter(prefix="/batches", tags=["Notes"])
+router = APIRouter(prefix="/batches", tags=["Batches"])
 
 db_dep = Annotated[AsyncSession, Depends(get_async_db)]
 user_dep = Annotated[dict, Depends(get_current_user)]

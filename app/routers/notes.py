@@ -33,12 +33,6 @@ async def get_categories_without_repeat (db: db_dep, user: user_dep):
 
     return categories
 
-@router.get("/categories/all/",  response_model=List[NoteCategorySchema])
-async def get_all_categories(db: db_dep, user: user_dep):
-
-    categories = await NoteCategory.get_all(db, [])
-   
-    return categories
 
 @router.get("/categories/batch/{id}/", response_model=List[NoteCategorySchema])
 async def get_batch_categories(db: db_dep, user: user_dep, id: int = Path(gt=0)):
@@ -46,6 +40,14 @@ async def get_batch_categories(db: db_dep, user: user_dep, id: int = Path(gt=0))
     categories = await NoteCategory.get_all(db, [NoteCategory.batch_id == id])
 
     return categories
+
+@router.get("/categories/all/",  response_model=List[NoteCategorySchema])
+async def get_all_categories(db: db_dep, user: user_dep):
+
+    categories = await NoteCategory.get_all(db, [])
+   
+    return categories
+
 
 @router.get("/categories/{id}/", response_model=NoteCategorySchema)
 async def get_category(db: db_dep, user: user_dep, id: int = Path(gt=0)):
