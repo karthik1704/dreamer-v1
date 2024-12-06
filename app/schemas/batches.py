@@ -1,7 +1,5 @@
 
 from pydantic import BaseModel
-from ..models.batches import Batch
-from enum import Enum
 
 class BatchSchema(BaseModel):
     id: int

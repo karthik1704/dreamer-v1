@@ -32,7 +32,7 @@ class NoteCategory(Base, DefaultFieldsMixin):
     notes: Mapped["Note"] = relationship(
         "Note", back_populates="category", lazy="selectin"
     )
-    batch:Mapped["Batch"] = relationship("Batch", back_populates="note_categories")
+    batch:Mapped["Batch"] = relationship("Batch", back_populates="note_categories", lazy="selectin")
 
     @classmethod
     async def get_all(cls, db_session: AsyncSession, where_condition: list[Any]):
@@ -41,6 +41,7 @@ class NoteCategory(Base, DefaultFieldsMixin):
             .where(*where_condition)
             .options(joinedload(cls.parent))
             .options(joinedload(cls.children))
+            .options(joinedload(cls.batch))
             .order_by(desc(cls.id))
         )
         _results = await db_session.execute(_stmt)
