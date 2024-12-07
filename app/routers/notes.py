@@ -102,9 +102,29 @@ async def delete_category(db: db_dep, user: user_dep, id: int = Path(gt=0)):
 @router.get("/student/", response_model=List[NoteSchema])
 async def get_student_notes(db: db_dep, student: student_dep):
 
-    notes = await Note.get_all(db, [Note.batch_id == student['batch_id']])
+    notes = await Note.get_all(db, [Note.batch_id == student['batch_id'], Note.category_id == None])
 
     return notes
+
+@router.get("/student/folders/", )
+async def get_student_notes_folders(db: db_dep, student: student_dep):
+
+    notes_folders = await NoteCategory.get_all_without_repeat(db, [Note.batch_id == student['batch_id']])
+
+    return notes_folders
+
+@router.get("/student/folders/{id}", )
+async def get_student_notes_folders_by_id(db: db_dep, student: student_dep, id:int=Path(gt=0)):
+
+    notes_folder = await NoteCategory.get_one(db, [Note.batch_id == student['batch_id'], NoteCategory.id == id])
+
+    if not notes_folder:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Folder not found",
+        )
+
+    return notes_folder
 
 @router.get("/student/{id}/", response_model=NoteSchema)    
 async def get_student_note(db: db_dep, student: student_dep, id: int = Path(gt=0)):

@@ -29,7 +29,7 @@ class NoteCategory(Base, DefaultFieldsMixin):
     children: Mapped[List["NoteCategory"]] = relationship(
         "NoteCategory", back_populates="parent", lazy="selectin"
     )
-    notes: Mapped["Note"] = relationship(
+    notes: Mapped[List["Note"]] = relationship(
         "Note", back_populates="category", lazy="selectin"
     )
     batch:Mapped["Batch"] = relationship("Batch", back_populates="note_categories", lazy="selectin")
@@ -53,7 +53,7 @@ class NoteCategory(Base, DefaultFieldsMixin):
     async def get_all_without_repeat(cls, db_session: AsyncSession, where_condition: list[Any]):
         _stmt = (
             select(cls)
-            .where(cls.parent_id == None)
+            .where(cls.parent_id == None, *where_condition)
             .options(joinedload(cls.children))
             .order_by(desc(cls.id))
         )
