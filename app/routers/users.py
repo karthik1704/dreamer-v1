@@ -28,6 +28,12 @@ async def get_current_loggedin_user(db: db_dep, user: user_dep):
 
     user_detail = await User.get_one(db, [User.id == user.get("id")])
 
+    if not user_detail:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
     return user_detail
 
 

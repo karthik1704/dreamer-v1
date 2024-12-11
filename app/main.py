@@ -7,8 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .settings import UPLOAD_DIR
 from .dependencies.auth import oauth2_bearer, oauth2_bearer_student
-from .routers import users, auth, batches, notes, videos, students, live_classes
-
+from .routers import users, auth, batches, notes,  students, live_classes
+from .routers.videos import students as student_videos, admin as admin_videos
 app = FastAPI(title="Seyon Acadamy V1", version="0.1.0")
 
 
@@ -44,7 +44,8 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(batches.router)
 app.include_router(notes.router)
-app.include_router(videos.router)
+app.include_router(admin_videos.router)
+app.include_router(student_videos.router)
 app.include_router(students.router)
 app.include_router(live_classes.router)
 

@@ -23,6 +23,8 @@ class NoteCategory(Base, DefaultFieldsMixin):
         ForeignKey("note_categories.id"), nullable=True
     )
 
+    image: Mapped[str] = mapped_column(Text, nullable=True)
+
     parent: Mapped[Optional["NoteCategory"]] = relationship(
         "NoteCategory", remote_side="NoteCategory.id", back_populates="children", lazy="joined"
     )
