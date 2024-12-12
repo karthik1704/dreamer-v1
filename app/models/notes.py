@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from sqlalchemy import DateTime, ForeignKey, Nullable, String, Text, select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped, mapped_column, relationship, joinedload
+from sqlalchemy.orm import Mapped, mapped_column, relationship, joinedload, selectinload
 
 from app.models import Base
 from app.models.default_fields import DefaultFieldsMixin
@@ -65,9 +65,10 @@ class NoteCategory(Base, DefaultFieldsMixin):
         _stmt = (
             select(cls)
             .where(cls.parent_id == None, *where_condition)
-            .options(joinedload(cls.children))
+            .options(  selectinload(cls.children),)
             .order_by(desc(cls.id))
         )
+        
         _results = await db_session.execute(_stmt)
         categories = _results.unique().scalars().all()
 

@@ -23,14 +23,14 @@ async def get_all_student_videos(db: db_dep,  student: student_dep):
 
     return videos
 
-@router.get("/folders/", response_model=List[VideoCategorySchema])
+@router.get("/folders/", )
 async def get_all_student_video_categories(db: db_dep, student: student_dep):
 
     categories = await VideoCategory.get_all_without_repeat(db, [VideoCategory.batch_id == student["batch_id"]])
 
     return categories
 
-@router.get("/folders/{id}/", response_model=VideoCategorySchema)
+@router.get("/folders/{id}/", )
 async def get_student_video_category(
     db: db_dep, student: student_dep, id: int = Path(gt=0)
 ):
