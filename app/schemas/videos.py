@@ -27,7 +27,7 @@ class VideoCategorySchema(BaseModel):
     id: int
     category_name: str
     category_code: str
-    image: str
+    image: Optional[str]
     parent_id: Optional[int] = None
     batch_id: int
     parent: Optional["VideoCategoryParentSchema"] = None
