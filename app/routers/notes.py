@@ -193,7 +193,7 @@ async def get_student_notes_folders(db: db_dep, student: student_dep):
 
 
 @router.get(
-    "/student/folders/{id}",
+    "/student/folders/{id}/",
 )
 async def get_student_notes_folders_by_id(
     db: db_dep, student: student_dep, id: int = Path(gt=0)
