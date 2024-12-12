@@ -67,56 +67,6 @@ async def get_video_category(db: db_dep, user: user_dep, id: int = Path(gt=0)):
 
 
 
-@router.get("/student", response_model=List[VideoSchema])
-async def get_all_student_videos(db: db_dep,  student: student_dep):
-
-    videos = await Video.get_all(db, [Video.batch_id == student["batch_id"]])
-
-    return videos
-
-@router.get("/folders/", )
-async def get_all_student_video_categories(db: db_dep, student: student_dep):
-
-    categories = await VideoCategory.get_all_without_repeat(db, [VideoCategory.batch_id == student["batch_id"]])
-
-    return categories
-
-@router.get("/folders/{id}/", )
-async def get_student_video_category(
-    db: db_dep, student: student_dep, id: int = Path(gt=0)
-):
-
-    category = await VideoCategory.get_one(
-        db, [VideoCategory.id == id, VideoCategory.batch_id == student["batch_id"]]
-    )
-
-    if not category:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Category not found",
-        )
-
-    return category
-
-
-@router.get("/student/{id}/", response_model=VideoSchema)
-async def get_student_video(
-    db: db_dep,  student: student_dep, id: int = Path(gt=0)
-):
-
-    video = await Video.get_one(
-        db, [Video.id == id, Video.batch_id == student["batch_id"]]
-    )
-
-    if not video:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Video not found",
-        )
-
-    return video
-
-
 @router.post(
     "/categories/", status_code=status.HTTP_201_CREATED
 )  # status code 201 for created
@@ -211,7 +161,7 @@ async def delete_video_category(db: db_dep, user: user_dep, id: int = Path(gt=0)
     await db.commit()
 
 
-@router.get("/student", response_model=List[VideoSchema])
+@router.get("/student/", response_model=List[VideoSchema])
 async def get_all_student_videos(db: db_dep,  student: student_dep):
 
     videos = await Video.get_all(db, [Video.batch_id == student["batch_id"]])
