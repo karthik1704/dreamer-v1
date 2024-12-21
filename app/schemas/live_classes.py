@@ -12,6 +12,9 @@ class LiveClassSchema(BaseModel):
     start_time: datetime
     end_time: datetime
 
+    batch: BatchSchema
+
+
     class Config:
         from_attributes = True
 
@@ -22,4 +25,3 @@ class LiveClassCreate(BaseModel):
     start_time: datetime
     end_time: datetime
     batch_id: int
-    batch: BatchSchema

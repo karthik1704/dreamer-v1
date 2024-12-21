@@ -26,7 +26,7 @@ async def get_all_live_classes(db: db_dep, user: user_dep):
 
 
 # """
-#     Student Videos
+#     Student 
 # """
 
 
