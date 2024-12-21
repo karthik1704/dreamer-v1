@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Path
 from starlette import status
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 from app.database import get_async_db
 from app.dependencies.auth import get_current_student, get_current_user
 
@@ -30,10 +30,13 @@ async def get_all_live_classes(db: db_dep, user: user_dep):
 # """
 
 
-@router.get("/student/", response_model=LiveClassSchema)
+@router.get("/student/", response_model=Optional[LiveClassSchema])
 async def get_all_student_live_class(db: db_dep, user: user_dep, student: student_dep):
 
     live = await LiveClass.get_one(db, [LiveClass.batch_id == student["batch_id"]])
+
+    if not live:
+        return None
 
     return live
 
